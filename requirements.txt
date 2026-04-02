@@ -1,0 +1,6 @@
+Django>=5.0
+djangorestframework
+djangorestframework-simplejwt
+django-filter
+drf-spectacular
+python-dotenv
