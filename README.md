@@ -132,3 +132,25 @@ source venv/bin/activate
 Go to: http://127.0.0.1:8000/api/docs/
   
 
+Postman Collection
+How to Import
+Open Postman.
+Click on Import button in the upper left corner.
+Choose Upload Files and select the Finance-Data-Processing-and-Access-Control.postman_collection.json file.
+Click Import.
+How to Use
+After importing, you will see the collection in your left sidebar.
+Click on the collection to view all the endpoints.
+Testing Procedures
+Each request can be executed independently in Postman.
+Verify responses against expected results shown in your API documentation.
+Environment Variables
+Define the following environment variables in Postman:
+
+baseUrl: The base URL for the API endpoints
+apiKey: Authentication API key if required
+Running the Tests
+Select a specific request from the collection.
+Set the appropriate environment (if applicable).
+Click on Send to execute the request.
+Check the response status and data.
