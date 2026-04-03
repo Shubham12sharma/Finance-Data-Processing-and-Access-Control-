@@ -112,6 +112,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'common.pagination.StandardResultsSetPagination',
     'PAGE_SIZE': 20,
+    'PAGE_NUMBER_PAGINATION_INVALID_PAGE': 'last',
 
     'EXCEPTION_HANDLER': 'common.exceptions.custom_exception_handler',
 }
