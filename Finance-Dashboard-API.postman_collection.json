@@ -1,0 +1,1146 @@
+{
+  "info": {
+    "name": "Finance Dashboard API",
+    "description": "Comprehensive Postman collection for Finance Data Processing and Access Control Backend\n\nThis collection includes:\n- User Registration & Authentication (JWT)\n- Financial Records CRUD Operations\n- Advanced Filtering\n- Dashboard Analytics\n- Role-Based Access Control Examples\n\nBase URL: http://127.0.0.1:8000/api\n\nSetup Instructions:\n1. Import this collection into Postman\n2. Set the 'baseUrl' variable to your API base URL\n3. Set 'access_token' after login (automatically extracted)\n4. Test different roles by logging in with different users",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+    "_exporter_id": "1234567"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "record_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User - Viewer Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.test('User registered successfully', function() {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData.message).to.include('registered');",
+                  "        pm.expect(jsonData.user.role).to.equal('viewer');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john_viewer\",\n  \"email\": \"john@example.com\",\n  \"password\": \"SecurePass123\",\n  \"password_confirm\": \"SecurePass123\",\n  \"role\": \"viewer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "register"
+              ]
+            },
+            "description": "Register a new user with Viewer role\n\n**Roles Available:**\n- viewer: Can only view data\n- analyst: Can view and create/update records\n- admin: Full access"
+          },
+          "response": []
+        },
+        {
+          "name": "Register User - Analyst Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.test('Analyst user registered', function() {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData.user.role).to.equal('analyst');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"jane_analyst\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"SecurePass123\",\n  \"password_confirm\": \"SecurePass123\",\n  \"role\": \"analyst\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "register"
+              ]
+            },
+            "description": "Register a new user with Analyst role"
+          },
+          "response": []
+        },
+        {
+          "name": "Register User - Admin Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.test('Admin user registered', function() {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData.user.role).to.equal('admin');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin_user\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"SecurePass123\",\n  \"password_confirm\": \"SecurePass123\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "register"
+              ]
+            },
+            "description": "Register a new user with Admin role"
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Get JWT Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('access_token', jsonData.access);",
+                  "    pm.environment.set('refresh_token', jsonData.refresh);",
+                  "    ",
+                  "    pm.test('Login successful and tokens received', function() {",
+                  "        pm.expect(jsonData.access).to.exist;",
+                  "        pm.expect(jsonData.refresh).to.exist;",
+                  "    });",
+                  "    ",
+                  "    // Decode JWT to see payload",
+                  "    console.log('Access Token set in environment');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"jane_analyst\",\n  \"password\": \"SecurePass123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/login/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            },
+            "description": "Login with username and password to get JWT tokens\n\n**Note:** Change username/password to match your test user\n\nResponse includes:\n- `access`: JWT token (valid for 60 minutes)\n- `refresh`: Refresh token (valid for 7 days)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Financial Records - CRUD",
+      "item": [
+        {
+          "name": "Create Record - Income",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('record_id', jsonData.id);",
+                  "    ",
+                  "    pm.test('Income record created successfully', function() {",
+                  "        pm.expect(jsonData.record_type).to.equal('income');",
+                  "        pm.expect(parseFloat(jsonData.amount)).to.equal(50000);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50000,\n  \"record_type\": \"income\",\n  \"category\": \"salary\",\n  \"date\": \"2026-04-01\",\n  \"description\": \"Monthly salary payment\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Create a new income record\n\n**Requirements:**\n- Analyst role or higher\n- Amount must be > 0\n- Valid category from: salary, freelance, food, transport, rent, utilities, entertainment, shopping, health, other"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Record - Expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.test('Expense record created', function() {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData.record_type).to.equal('expense');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500,\n  \"record_type\": \"expense\",\n  \"category\": \"food\",\n  \"date\": \"2026-04-02\",\n  \"description\": \"Groceries and dining out\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Create a new expense record"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Records",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Records retrieved successfully', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.results).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Retrieve all financial records for the authenticated user\n\n**Access:** All roles (Viewer, Analyst, Admin)\n\n**Response:** Paginated list (20 per page)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Records - Paginated",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/?page=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Get records with pagination (page parameter)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Record",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/1/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "1"
+              ]
+            },
+            "description": "Get a specific record by ID\n\nChange the ID in the URL to the record you want to retrieve"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Record (PUT - Full)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Record updated successfully', function() {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(parseFloat(jsonData.amount)).to.equal(75000);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 75000,\n  \"record_type\": \"income\",\n  \"category\": \"salary\",\n  \"date\": \"2026-04-01\",\n  \"description\": \"Updated monthly salary\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/records/1/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "1"
+              ]
+            },
+            "description": "Update a record (full replacement)\n\n**Requirements:**\n- Analyst role or higher\n- Must provide all fields\n- Owner only"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Record (PATCH - Partial)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Record partially updated', function() {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(parseFloat(jsonData.amount)).to.equal(65000);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 65000,\n  \"description\": \"Salary adjusted\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/records/1/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "1"
+              ]
+            },
+            "description": "Partially update a record (only send fields to update)\n\n**Requirements:**\n- Analyst role or higher\n- Only required fields to update"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Record (Soft Delete)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Record deleted (soft delete)', function() {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/1/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "1"
+              ]
+            },
+            "description": "Delete a record (soft delete - record marked as deleted, not removed from DB)\n\n**Requirements:**\n- Analyst role or higher\n- Owner only"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔍 Advanced Filtering",
+      "item": [
+        {
+          "name": "Filter by Type - Income Only",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/?record_type=income",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "record_type",
+                  "value": "income"
+                }
+              ]
+            },
+            "description": "Get only income records"
+          },
+          "response": []
+        },
+        {
+          "name": "Filter by Type - Expenses Only",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/?record_type=expense",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "record_type",
+                  "value": "expense"
+                }
+              ]
+            },
+            "description": "Get only expense records"
+          },
+          "response": []
+        },
+        {
+          "name": "Filter by Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/?category=salary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "salary"
+                }
+              ]
+            },
+            "description": "Get records by category\n\nAvailable categories:\n- salary\n- freelance\n- food\n- transport\n- rent\n- utilities\n- entertainment\n- shopping\n- health\n- other"
+          },
+          "response": []
+        },
+        {
+          "name": "Filter by Date Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/?start_date=2026-01-01&end_date=2026-04-30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "start_date",
+                  "value": "2026-01-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2026-04-30"
+                }
+              ]
+            },
+            "description": "Get records within a date range"
+          },
+          "response": []
+        },
+        {
+          "name": "Filter by Amount Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/?min_amount=1000&max_amount=50000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "min_amount",
+                  "value": "1000"
+                },
+                {
+                  "key": "max_amount",
+                  "value": "50000"
+                }
+              ]
+            },
+            "description": "Get records within an amount range"
+          },
+          "response": []
+        },
+        {
+          "name": "Combined Filters - Income Salary Jan-Apr 2026",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/?record_type=income&category=salary&start_date=2026-01-01&end_date=2026-04-30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "record_type",
+                  "value": "income"
+                },
+                {
+                  "key": "category",
+                  "value": "salary"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2026-01-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2026-04-30"
+                }
+              ]
+            },
+            "description": "Combine multiple filters to narrow down results"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Record Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/stats/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "stats"
+              ]
+            },
+            "description": "Get quick statistics for current user's records\n\nReturns:\n- total_income\n- total_expenses\n- net_balance"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📈 Dashboard Analytics",
+      "item": [
+        {
+          "name": "Get Dashboard Summary",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Dashboard summary retrieved', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.all.keys(",
+                  "        'total_income',",
+                  "        'total_expenses',",
+                  "        'net_balance',",
+                  "        'category_breakdown',",
+                  "        'recent_activity',",
+                  "        'total_records',",
+                  "        'monthly_trend'",
+                  "    );",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/summary/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "summary"
+              ]
+            },
+            "description": "Get comprehensive dashboard summary with visualization-ready data\n\n**Access:** All authenticated users (Viewer, Analyst, Admin)\n\n**Response includes:**\n- `total_income`: Sum of all income records\n- `total_expenses`: Sum of all expense records\n- `net_balance`: Income - Expenses\n- `category_breakdown`: Pie chart ready data\n- `monthly_trend`: 3-month trend (Line/Bar chart ready)\n- `recent_activity`: Last 5 transactions\n- `total_records`: Count of all records"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🚫 Error Handling & Validation Examples",
+      "item": [
+        {
+          "name": "Error - Invalid Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid_token_123"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Test error handling with invalid JWT token\n\nExpected: 401 Unauthorized"
+          },
+          "response": []
+        },
+        {
+          "name": "Error - Missing Authorization Header",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Test error handling when authorization header is missing\n\nExpected: 401 Unauthorized"
+          },
+          "response": []
+        },
+        {
+          "name": "Error - Viewer Cannot Create Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"record_type\": \"income\",\n  \"category\": \"salary\",\n  \"date\": \"2026-04-01\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Test RBAC - Viewer role cannot create records\n\n**Setup:** Login with john_viewer user first\n\nExpected: 403 Forbidden"
+          },
+          "response": []
+        },
+        {
+          "name": "Error - Invalid Amount (Negative)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": -500,\n  \"record_type\": \"income\",\n  \"category\": \"salary\",\n  \"date\": \"2026-04-01\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Test validation - Amount must be positive\n\nExpected: 400 Bad Request"
+          },
+          "response": []
+        },
+        {
+          "name": "Error - Passwords Don't Match (Register)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"test_user\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123\",\n  \"password_confirm\": \"Password456\",\n  \"role\": \"viewer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "register"
+              ]
+            },
+            "description": "Test validation - Passwords must match\n\nExpected: 400 Bad Request"
+          },
+          "response": []
+        },
+        {
+          "name": "Error - Record Not Found",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/99999/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "99999"
+              ]
+            },
+            "description": "Test error handling - Record doesn't exist\n\nExpected: 404 Not Found"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Role-Based Access Control Tests",
+      "item": [
+        {
+          "name": "RBAC - Viewer: View Records ",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Test: Viewer can view records\n\n**Expected:** ✅ 200 OK\n\n**Setup:** Use john_viewer credentials"
+          },
+          "response": []
+        },
+        {
+          "name": "RBAC - Viewer: Cannot Create Records ❌",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"record_type\": \"income\",\n  \"category\": \"salary\",\n  \"date\": \"2026-04-01\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Test: Viewer cannot create records\n\n**Expected:** ❌ 403 Forbidden\n\n**Setup:** Use john_viewer credentials"
+          },
+          "response": []
+        },
+        {
+          "name": "RBAC - Analyst: View Records ",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Test: Analyst can view records\n\n**Expected:** ✅ 200 OK\n\n**Setup:** Use jane_analyst credentials"
+          },
+          "response": []
+        },
+        {
+          "name": "RBAC - Analyst: Create Records ✅",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 5000,\n  \"record_type\": \"income\",\n  \"category\": \"freelance\",\n  \"date\": \"2026-04-03\",\n  \"description\": \"Freelance project payment\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Test: Analyst can create records\n\n**Expected:** ✅ 201 Created\n\n**Setup:** Use jane_analyst credentials"
+          },
+          "response": []
+        },
+        {
+          "name": "RBAC - Admin: Full Access ",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Test: Admin can access all endpoints\n\n**Expected:** ✅ 200 OK\n\n**Setup:** Use admin_user credentials"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Documentation & Support",
+      "item": [
+        {
+          "name": "View Swagger API Docs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/docs/",
+              "protocol": "http",
+              "host": [
+                "127.0.0.1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "docs"
+              ]
+            },
+            "description": "Open Swagger UI documentation in browser\n\nThis provides interactive API documentation with try-it-out functionality"
+          },
+          "response": []
+        },
+        {
+          "name": "Download OpenAPI Schema",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/schema/",
+              "protocol": "http",
+              "host": [
+                "127.0.0.1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "schema"
+              ]
+            },
+            "description": "Download the OpenAPI schema JSON for integration with other tools"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
